@@ -21,7 +21,8 @@
       #loading .title { font-size: 20px; }
       #loading .bar { width: min(240px, 60vw); height: 2px; background: rgba(244, 239, 226, 0.2); }
       #loading .fill { width: 0; height: 100%; background: #c8553d; transition: width 0.2s; }
-      #loading .note { font-size: 14px; opacity: 0.85; }
+      #loading .sound { font-size: 16px; color: #f4efe2; margin-top: 6px; }
+      #loading .note { font-size: 13px; opacity: 0.7; }
       #error { position: fixed; left: 0; right: 0; bottom: 0; padding: 12px 16px; background: #8a2b1d; color: #fff;
         font: 14px sans-serif; display: none; }
     </style>
@@ -31,7 +32,8 @@
     <div id="loading">
       <div class="title">縁側と蚊取りブタ</div>
       <div class="bar"><div class="fill" id="fill"></div></div>
-      <div class="note">音が出ます。読み込みに少し時間がかかります</div>
+      <div class="sound">♪ 音が出ます</div>
+      <div class="note">読み込みに少し時間がかかります</div>
     </div>
     <div id="error"></div>
     <script>
@@ -51,7 +53,7 @@
       var buildUrl = "Build";
       // ビルドごとに変わる番号（KatoributaWebGLBuilder がビルド後に書き込む）。ブラウザに残った古い
       // framework.js と新しい wasm が混ざると起動時に落ちるので、URL を毎回変えてキャッシュを分ける
-      var v = "?v=20261120080658";
+      var v = "?v=20261120082213";
       var config = {
         dataUrl: buildUrl + "/WebGL.data.unityweb" + v,
         frameworkUrl: buildUrl + "/WebGL.framework.js.unityweb" + v,
