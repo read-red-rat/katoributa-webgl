@@ -1,116 +1,84 @@
 <!DOCTYPE html>
-<html lang="en-us">
+<html lang="ja">
   <head>
     <meta charset="utf-8">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Unity WebGL Player | VirtualkatoributaURP</title>
-    <link rel="shortcut icon" href="TemplateData/favicon.ico">
-    <link rel="stylesheet" href="TemplateData/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#1b2a44">
+    <title>縁側と蚊取りブタ</title>
+    <style>
+      /* 画面いっぱいにキャンバスを敷く（スマホの横・縦、PC のウィンドウどれでも UI が切れないように） */
+      html, body { margin: 0; height: 100%; background: #1b2a44; overflow: hidden; }
+      #unity-canvas {
+        position: fixed; inset: 0; width: 100vw; height: 100vh; height: 100dvh;
+        display: block; background: #1b2a44; touch-action: none; outline: none;
+        -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none;
+      }
+      #loading {
+        position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+        gap: 14px; color: #f4efe2; font-family: "Hiragino Mincho ProN", "Yu Mincho", serif; letter-spacing: 0.12em;
+        background: #1b2a44; transition: opacity 0.8s ease;
+      }
+      #loading .title { font-size: 20px; }
+      #loading .bar { width: min(240px, 60vw); height: 2px; background: rgba(244, 239, 226, 0.2); }
+      #loading .fill { width: 0; height: 100%; background: #c8553d; transition: width 0.2s; }
+      #loading .note { font-size: 14px; opacity: 0.85; }
+      #error { position: fixed; left: 0; right: 0; bottom: 0; padding: 12px 16px; background: #8a2b1d; color: #fff;
+        font: 14px sans-serif; display: none; }
+    </style>
   </head>
   <body>
-    <div id="unity-container" class="unity-desktop">
-      <canvas id="unity-canvas" width=960 height=600></canvas>
-      <div id="unity-loading-bar">
-        <div id="unity-logo"></div>
-        <div id="unity-progress-bar-empty">
-          <div id="unity-progress-bar-full"></div>
-        </div>
-      </div>
-      <div id="unity-warning"> </div>
-      <div id="unity-footer">
-        <div id="unity-webgl-logo"></div>
-        <div id="unity-fullscreen-button"></div>
-        <div id="unity-build-title">VirtualkatoributaURP</div>
-      </div>
+    <canvas id="unity-canvas" tabindex="-1"></canvas>
+    <div id="loading">
+      <div class="title">縁側と蚊取りブタ</div>
+      <div class="bar"><div class="fill" id="fill"></div></div>
+      <div class="note">音が出ます。読み込みに少し時間がかかります</div>
     </div>
+    <div id="error"></div>
     <script>
-      var container = document.querySelector("#unity-container");
       var canvas = document.querySelector("#unity-canvas");
-      var loadingBar = document.querySelector("#unity-loading-bar");
-      var progressBarFull = document.querySelector("#unity-progress-bar-full");
-      var fullscreenButton = document.querySelector("#unity-fullscreen-button");
-      var warningBanner = document.querySelector("#unity-warning");
+      var loading = document.querySelector("#loading");
+      var fill = document.querySelector("#fill");
+      var mobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
-      // Shows a temporary message banner/ribbon for a few seconds, or
-      // a permanent error message on top of the canvas if type=='error'.
-      // If type=='warning', a yellow highlight color is used.
-      // Modify or remove this function to customize the visually presented
-      // way that non-critical warnings and error messages are presented to the
-      // user.
-      function unityShowBanner(msg, type) {
-        function updateBannerVisibility() {
-          warningBanner.style.display = warningBanner.children.length ? 'block' : 'none';
-        }
-        var div = document.createElement('div');
-        div.innerHTML = msg;
-        warningBanner.appendChild(div);
-        if (type == 'error') div.style = 'background: red; padding: 10px;';
-        else {
-          if (type == 'warning') div.style = 'background: yellow; padding: 10px;';
-          setTimeout(function() {
-            warningBanner.removeChild(div);
-            updateBannerVisibility();
-          }, 5000);
-        }
-        updateBannerVisibility();
+      // エラーだけを表示する（Unity 標準の「モバイル非対応」の帯は出さない）
+      function showBanner(msg, type) {
+        if (type !== "error") { console.warn(msg); return; }
+        var e = document.querySelector("#error");
+        e.textContent = msg;
+        e.style.display = "block";
       }
 
       var buildUrl = "Build";
-      var loaderUrl = buildUrl + "/WebGL.loader.js";
+      // ビルドごとに変わる番号（KatoributaWebGLBuilder がビルド後に書き込む）。ブラウザに残った古い
+      // framework.js と新しい wasm が混ざると起動時に落ちるので、URL を毎回変えてキャッシュを分ける
+      var v = "?v=20261120080658";
       var config = {
-        dataUrl: buildUrl + "/WebGL.data.unityweb",
-        frameworkUrl: buildUrl + "/WebGL.framework.js.unityweb",
-        codeUrl: buildUrl + "/WebGL.wasm.unityweb",
+        dataUrl: buildUrl + "/WebGL.data.unityweb" + v,
+        frameworkUrl: buildUrl + "/WebGL.framework.js.unityweb" + v,
+        codeUrl: buildUrl + "/WebGL.wasm.unityweb" + v,
         streamingAssetsUrl: "StreamingAssets",
         companyName: "DefaultCompany",
         productName: "VirtualkatoributaURP",
         productVersion: "0.1.0",
-        showBanner: unityShowBanner,
+        showBanner: showBanner,
+        // スマホは高解像度のまま描くと重いので、描画の解像度を最大 2 倍までに抑える
+        devicePixelRatio: Math.min(window.devicePixelRatio || 1, mobile ? 2 : 2.5),
       };
-
-      // By default Unity keeps WebGL canvas render target size matched with
-      // the DOM size of the canvas element (scaled by window.devicePixelRatio)
-      // Set this to false if you want to decouple this synchronization from
-      // happening inside the engine, and you would instead like to size up
-      // the canvas DOM size and WebGL render target sizes yourself.
-      // config.matchWebGLToCanvasSize = false;
-
-      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-        // Mobile device style: fill the whole browser client area with the game canvas:
-
-        var meta = document.createElement('meta');
-        meta.name = 'viewport';
-        meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
-        document.getElementsByTagName('head')[0].appendChild(meta);
-        container.className = "unity-mobile";
-        canvas.className = "unity-mobile";
-
-        // To lower canvas resolution on mobile devices to gain some
-        // performance, uncomment the following line:
-        // config.devicePixelRatio = 1;
-
-        unityShowBanner('WebGL builds are not supported on mobile devices.');
-      } else {
-        // Desktop style: Render the game canvas in a window that can be maximized to fullscreen:
-
-        canvas.style.width = "960px";
-        canvas.style.height = "600px";
-      }
-
-      loadingBar.style.display = "block";
+      // 確認用：?dpr=1 で描画解像度を下げる（エミュレータなど遅い環境で操作を軽くする）
+      var dprParam = /[?&]dpr=([0-9.]+)/.exec(location.search);
+      if (dprParam) config.devicePixelRatio = parseFloat(dprParam[1]);
 
       var script = document.createElement("script");
-      script.src = loaderUrl;
-      script.onload = () => {
-        createUnityInstance(canvas, config, (progress) => {
-          progressBarFull.style.width = 100 * progress + "%";
-        }).then((unityInstance) => {
-          loadingBar.style.display = "none";
-          fullscreenButton.onclick = () => {
-            unityInstance.SetFullscreen(1);
-          };
-        }).catch((message) => {
-          alert(message);
+      script.src = buildUrl + "/WebGL.loader.js" + v;
+      script.onload = function () {
+        createUnityInstance(canvas, config, function (progress) {
+          fill.style.width = (100 * progress) + "%";
+        }).then(function () {
+          loading.style.opacity = "0";
+          setTimeout(function () { loading.style.display = "none"; }, 900);
+          canvas.focus();
+        }).catch(function (message) {
+          showBanner("読み込みに失敗しました。ページを再読み込みしてください。（" + String(message).split("\n")[0] + "）", "error");
         });
       };
       document.body.appendChild(script);
