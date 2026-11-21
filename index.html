@@ -53,14 +53,14 @@
       var buildUrl = "Build";
       // ビルドごとに変わる番号（KatoributaWebGLBuilder がビルド後に書き込む）。ブラウザに残った古い
       // framework.js と新しい wasm が混ざると起動時に落ちるので、URL を毎回変えてキャッシュを分ける
-      var v = "?v=20261120082213";
+      var v = "?v=20261121102139";
       var config = {
         dataUrl: buildUrl + "/WebGL.data.unityweb" + v,
         frameworkUrl: buildUrl + "/WebGL.framework.js.unityweb" + v,
         codeUrl: buildUrl + "/WebGL.wasm.unityweb" + v,
         streamingAssetsUrl: "StreamingAssets",
         companyName: "DefaultCompany",
-        productName: "VirtualkatoributaURP",
+        productName: "縁側と蚊取りブタ",
         productVersion: "0.1.0",
         showBanner: showBanner,
         // スマホは高解像度のまま描くと重いので、描画の解像度を最大 2 倍までに抑える

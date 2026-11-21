@@ -1,0 +1,14 @@
+環境音の録音素材（Assets/Katoributa/Audio/*.mp3）
+
+出典：効果音ラボ  https://soundeffect-lab.info/
+利用規約：https://soundeffect-lab.info/agreement/
+  - 商用・非商用を問わず無料。報告・リンク・クレジット表記は不要（任意）
+  - アプリへの組み込み（音源ファイルが含まれる形）は再配布にあたらない、と規約に明記
+  - 素材そのもの（改変したものを含む）を素材として再配布・販売することは禁止
+取得日：2026-11-21
+
+ファイル（元のファイル名のまま）
+  セミ：hyalessa-maculaticollis-thickets1（ミンミンゼミが鳴く雑木林）, aburazemi-cry1/2, higurashi-cry1, tsukutsukuboushi-cry1/2
+  夜・水辺：toad1（カエルの大合唱）, summer-night-country1（夏の田舎の夜）, teleogryllus-emma-cry1（エンマコオロギ）, creek1（小川）
+  風・雨・雷：furin1, wind1〜4, rain1/2, thunder1〜3
+  出来事：train-pass1〜3, fireworks1/2, glass-ice1, milvus-migrans-cry1（トンビ）, passer-montanus-cry1（スズメ）, evening-crow1
